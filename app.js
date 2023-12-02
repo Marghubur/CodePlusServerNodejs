@@ -1,7 +1,7 @@
+require("dotenv").config();
 const express = require("express");
-
 const app = express();
-
+var cors = require('cors');
 
 const PORT = process.env.PORT || 7500;
 const contentRoute = require("./routes/contentListRoute");
@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 });
 
 // middleware or routes
-
+app.use(cors());
 app.use("/api/content", contentRoute);
 app.use("/api/user", userRoute);
 
