@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 
 // middleware or routes
 app.use(cors());
-app.use("/api/content", contentRoute);
+app.use("/api/Article", contentRoute);
 app.use("/api/user", userRoute);
 
 

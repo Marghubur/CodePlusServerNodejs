@@ -10,7 +10,12 @@ const getAllContent = async (req, res) => {
     try {
         contentlist.findAll().then(data => {
             console.log("Hit user");
-            res.send(data);
+            const responseData = {
+                StatusMessage: 'success',
+                ResponseBody: data,
+                StatusCode: 200
+              };
+            res.status(200).json(responseData);
         })
     } catch (error) {   
         res.status(500).send("Internal server error");

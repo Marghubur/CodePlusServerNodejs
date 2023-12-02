@@ -6,7 +6,7 @@ const {getAllContent} = require("../controller/contentListController.js");
 
 router.get("/getAllContent", getAllContent);
 
-router.get("/GetContentList", getAllContent);
+router.get("/GetContentList/:page", getAllContent);
 
 
 router.get("/about", function (req, res) {
