@@ -2,30 +2,24 @@ const db = require("../db.config");
 const contentlist = db.contentlist;
 const fileUpload = require('express-fileupload');
 const path = require('path');
-const util = require("../util/util.js")
+const util = require("../util/util.js");
+const { ApiResponse } = require("../util/apiResponse.js");
 
-const getContent = async (req, res) => {
-    res.send({msg: __dirname + ": " + process.cwd()});
+const getContent = async (req, res, next) => {
+    return next(ApiResponse({msg: __dirname + ": " + process.cwd()}, 200));
 };
 
-const getAllContent = async (req, res) => {
+const getAllContent = async (req, res, next) => {
     try {
-        
         contentlist.findAll().then(data => {
-            console.log("Hit user");
-            const responseData = {
-                StatusMessage: 'success',
-                ResponseBody: data,
-                StatusCode: 200
-              };
-            res.status(200).json(responseData);
+            return next(ApiResponse(data, 200))
         })
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
-const GetContentList = async (req, res) => {
+const GetContentList = async (req, res, next) => {
     try {
         const page =  req.params.page; // Get the page from the query parameters, default to page 1
         const limit = 10; // Number of items per page
@@ -36,54 +30,39 @@ const GetContentList = async (req, res) => {
             }
         }).then(data => {
             var result = data.splice(offset, limit);
-            const responseData = {
-                StatusMessage: "Success",
-                ResponseBody: result,
-                StatusCode: 200
-              };
-            res.status(200).json(responseData);
+            return next(ApiResponse(result, 200));
         })
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
-const GetAllContentList = async (req, res) => {
+const GetAllContentList = async (req, res, next) => {
     try {
         const page =  req.params.page; // Get the page from the query parameters, default to page 1
         const limit = 10; // Number of items per page
         const offset = (page - 1) * limit;
         contentlist.findAll().then(data => {
             var result = data.splice(offset, limit);
-            const responseData = {
-                StatusMessage: "Success",
-                ResponseBody: result,
-                StatusCode: 200
-              };
-            res.status(200).json(responseData);
+            return next(ApiResponse(result, 200));
         })
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
-const GetContentById = async (req, res) => {
+const GetContentById = async (req, res, next) => {
     try {
         const id =  req.params.contentId; 
         contentlist.findByPk(id).then(data => {
-            const responseData = {
-                StatusMessage: "Success",
-                ResponseBody: data,
-                StatusCode: 200
-              };
-            res.status(200).json(responseData);
+            return next(ApiResponse(data, 200));
         })
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
-const GetArticleList = async (req, res) => {
+const GetArticleList = async (req, res, next) => {
     try {
         const page =  req.params.page; // Get the page from the query parameters, default to page 1
         const limit = 10; // Number of items per page
@@ -95,22 +74,17 @@ const GetArticleList = async (req, res) => {
             }
         }).then(data => {
             var result = data.splice(offset, limit);
-            const responseData = {
-                StatusMessage: "Success",
-                ResponseBody: result,
-                StatusCode: 200
-              };
-            res.status(200).json(responseData);
+            return next(ApiResponse(result, 200));
         })
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
-const SaveArticle = async (req, res) => {
+const SaveArticle = async (req, res, next) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send('No files were uploaded.');
+            return next(ApiResponse('No files were uploaded.', 400));
         }
     
         const uploadedFile = req.files.file;
@@ -118,12 +92,12 @@ const SaveArticle = async (req, res) => {
         var user = JSON.parse(text);
         var imgpath = util.saveFile("article", uploadedFile, user.Type + "_"+ user.Part, null);
         if (!imgpath) 
-            return res.status(500).send("Fail to save image");
+            return next(ApiResponse("Fail to save image", 500));
         
         user.ImgPath = imgpath;
         var filepath = util.saveTxtFile("article", user.BodyContent, user.Type + "_"+ user.Part);
         if (!filepath)
-            return res.status(500).send("Fail to generate text file");
+            return next(ApiResponse("Fail to generate text file", 500));
         
         user.FilePath = filepath;
         var result = null;
@@ -132,9 +106,14 @@ const SaveArticle = async (req, res) => {
         else
             result = updateArticle(user);
 
-        return res.status(200).json(result);
+        const responseData = {
+            StatusMessage: 'success',
+            ResponseBody: result,
+            StatusCode: 200
+        };
+        return next(ApiResponse(result, 200));
     } catch (error) {   
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
@@ -154,6 +133,7 @@ const createArticle = async (contentDetail) => {
         else
             contentDetail.Tags = "[]";
         contentDetail.SaveOn = new Date();
+
         await contentlist.create(contentDetail);
         return contentObj;
     } catch (error) {
@@ -185,7 +165,7 @@ const updateArticle = async (contentDetail) => {
     }
 }
 
-const PublishArticle = async (req, res) => {
+const PublishArticle = async (req, res, next) => {
     try {
         const contentId = req.body.ContentId;
         const IsPublish = req.body.IsPublish;
@@ -219,14 +199,14 @@ const PublishArticle = async (req, res) => {
             },
         });
 
-        res.status(200).json(contentDetail);
+        return next(ApiResponse(contentDetail, 200));
     } catch (error) {
-        res.status(500).send(error.message);
+        return next(ApiResponse(error.message, 500));
     }
 };
 
 
-const saveFile = async (req, res) => {
+const saveFile = async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files were uploaded.');
       }
@@ -240,7 +220,7 @@ const saveFile = async (req, res) => {
       uploadedFile.mv(targetPath, (err) => {
         if (err) {
           console.error(err);
-          return res.status(500).send(err.message);
+          return next(ApiResponse(error.message, 500));
         }
     
         res.send('File uploaded and moved successfully.');

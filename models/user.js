@@ -16,6 +16,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         UsertypeId: {
             type: Sequelize.INTEGER
+        },
+        RoleName: {
+            type: Sequelize.VIRTUAL
+        },
+        RememberMe: {
+            type: Sequelize.VIRTUAL
         }
     });
 
