@@ -167,13 +167,6 @@ const updateArticle = async (contentDetail) => {
         if (!content)
             return "record not found";
 
-        // content.Part = contentDetail.Part;
-        // content.Type = contentDetail.Type;
-        // content.Detail = contentDetail.Detail;
-        // content.IsArticle = contentDetail.IsArticle;
-        // content.ImgPath = contentDetail.ImgPath;
-        // content.Title = contentDetail.Title;
-
         contentDetail.ContentId = content.ContentId;
         if (contentDetail.AllTags != null && contentDetail.AllTags.length > 0)
             contentDetail.Tags = JSON.stringify(contentDetail.AllTags);
@@ -194,7 +187,8 @@ const updateArticle = async (contentDetail) => {
 
 const PublishArticle = async (req, res) => {
     try {
-        const contentId = 0;
+        const contentId = req.body.ContentId;
+        const IsPublish = req.body.IsPublish;
         var content = await contentlist.findByPk(contentId);
         if (!content)
             return "record not found";
@@ -203,9 +197,31 @@ const PublishArticle = async (req, res) => {
         if (content.IsPublish)
             content.PublishOn = new Date();
 
-        return content;
+        const contentDetail = {
+            ContentId: contentId,
+            Type: content.Type,
+            Part: content.Part,
+            FilePath: content.FilePath,
+            FileId: content.FileId,
+            Title: content.Title,
+            Detail: content.Detail,
+            ImgPath: content.ImgPath,
+            IsArticle: content.IsArticle,
+            IsPublish: content.IsPublish,
+            PublishOn: content.PublishOn,
+            SaveOn: content.SaveOn,
+            Tags: content.Tags,
+            Author: content.Author,
+        }
+        await contentlist.update(contentDetail, {
+            where : {
+                ContentId: contentDetail.ContentId,
+            },
+        });
+
+        res.status(200).json(contentDetail);
     } catch (error) {
-        return (error);
+        res.status(500).send(error.message);
     }
 };
 
