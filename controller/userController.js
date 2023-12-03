@@ -2,6 +2,7 @@ const db = require("../db.config");
 const user = db.user;
 const bcrypt = require("bcryptjs");
 const { ApiResponse } = require("../util/apiResponse.js");
+const jwt = require("jsonwebtoken");
 
 const getUser = async (req, res, next) => {
     res.send({msg: "User Controller hit successfully"});
@@ -68,10 +69,10 @@ const Login = async (req, res, next) => {
         var Email = req.body.Email;
         var Password = req.body.Password;
         if (!Email)
-        return next(ApiResponse("Invalid email", 500));
+            return next(ApiResponse("Invalid email", 500));
 
         if (!Password)
-        return next(ApiResponse("Invalid password", 500));
+            return next(ApiResponse("Invalid password", 500));
 
         var existUser = await user.findOne({ where: { Email: Email } });
         if (!existUser)
@@ -81,7 +82,21 @@ const Login = async (req, res, next) => {
         if (!isPasswordCorrect)
             return next(ApiResponse("Please enter registered password", 500));
 
-        return next(ApiResponse("Registration successfully", 200));
+        var role = null;
+        switch (existUser.UsertypeId) {
+            case 1:
+                role = "Admin"
+                break;
+            default:
+                role = "User"
+                break;
+        }
+        var jwtSecret = "MyJwt@$Secret4codeplus@blogBYm4M@rghub";
+        const token = jwt.sign({id: existUser.UserId, user: existUser, email: existUser.Email, role:role}, jwtSecret);
+        return res.cookie("access_token", token, {httpOnly: true}).status(200).json(ApiResponse({
+            User: existUser,
+            Token: token
+        }, 200));
     } catch (error) {
         return next(ApiResponse(error.message, 500));
     }

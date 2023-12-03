@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const PORT = process.env.PORT || 7500;
 const contentRoute = require("./routes/contentListRoute");
 const userRoute = require("./routes/userRoute");
+const cookieParser = require("cookie-parser");
 
 app.get("/", (req, res) => {
     res.send("Hi, I am live");
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 // middleware or routes
 app.use(cors());
 app.use(fileUpload());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/api/Article", contentRoute);
 app.use("/api/User", userRoute);
