@@ -63,6 +63,9 @@ const GetContentById = async (req, res, next) => {
                 return next(ApiResponse("Record not found", 500));
 
             var filepath = path.join(process.cwd(), "public", data.FilePath);
+            if (filepath.includes("\\"))
+                filepath = filepath.replace("\\", "/");
+            
             const readData = fs.readFileSync(filepath, "utf8");
             data.BodyContent = readData;
             return next(ApiResponse(data, 200));
