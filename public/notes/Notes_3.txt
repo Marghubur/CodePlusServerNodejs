@@ -1,0 +1,21 @@
+There are 2 options:
+
+1st Option:
+If you re using NewtonsoftJSon then add this line 
+
+Simply add this to your Startup.cs:
+
+services.AddControllers()
+.AddJsonOptions(options =>
+{
+   options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+
+2nd Option:
+Using Microsoft.MVC.Newtonsoft then add this
+
+services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });

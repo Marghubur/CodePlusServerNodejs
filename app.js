@@ -4,6 +4,7 @@ const app = express();
 var cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const path = require('path');
 
 const PORT = process.env.PORT || 7500;
 const contentRoute = require("./routes/contentListRoute");
@@ -14,11 +15,17 @@ app.get("/", (req, res) => {
     res.send("Hi, I am live");
 });
 
-// middleware or routes
+// Configure static file serving
+app.use(express.static('public'));
+
+// middleware
 app.use(cors());
 app.use(fileUpload());
 app.use(cookieParser());
 app.use(bodyParser.json());
+
+
+// routes middleware
 app.use("/api/Article", contentRoute);
 app.use("/api/User", userRoute);
 

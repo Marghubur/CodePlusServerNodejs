@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 const path = require('path');
 const util = require("../util/util.js");
 const { ApiResponse } = require("../util/apiResponse.js");
+const fs = require('fs');
 
 const getContent = async (req, res, next) => {
     return next(ApiResponse({msg: __dirname + ": " + process.cwd()}, 200));
@@ -53,8 +54,17 @@ const GetAllContentList = async (req, res, next) => {
 
 const GetContentById = async (req, res, next) => {
     try {
-        const id =  req.params.contentId; 
-        contentlist.findByPk(id).then(data => {
+        const id =  Number(req.params.contentId);
+        if (id <= 0)
+            return next(ApiResponse("Invalid content id", 500));
+
+        await contentlist.findByPk(id).then(data => {
+            if (!data)
+                return next(ApiResponse("Record not found", 500));
+
+            var filepath = path.join(process.cwd(), data.FilePath);
+            const readData = fs.readFileSync(filepath, "utf8");
+            data.BodyContent = readData;
             return next(ApiResponse(data, 200));
         })
     } catch (error) {   

@@ -1,0 +1,23 @@
+private List<string> GetAllFilesInDirectory(string targetDirectory, List<string> list = null)
+{
+        if (list == null)
+        {
+        list = new List<string>();
+        }
+
+        string[] fileEntries = Directory.GetFiles(targetDirectory);
+
+        foreach (string fileName in fileEntries)
+        {
+        string extension = Path.GetExtension(fileName);
+        if (extension.Equals(".yml"))
+                list.Add(fileName);
+        }
+
+        string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+
+        foreach (string subdirectory in subdirectoryEntries)
+        GetAllFilesInDirectory(subdirectory, list);
+
+        return list;
+}

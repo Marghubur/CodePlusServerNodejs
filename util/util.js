@@ -12,7 +12,7 @@ module.exports = {
 
         var ext = (uploadedFile.name||'').split('.');
         const fileExtension = ext[ext.length - 1];
-        const folderPath = path.join(process.cwd(), folderName);
+        const folderPath = path.join(process.cwd(),"public", folderName);
         const targetPath = path.join(folderPath, fileName + "." +fileExtension);
         !fs.existsSync(folderPath) && fs.mkdirSync(folderPath);
         if (fs.existsSync(targetPath)) {
@@ -29,7 +29,7 @@ module.exports = {
     },
 
     saveTxtFile(folderName, content, fileName) {
-        const folderPath = path.join(process.cwd(), folderName);
+        const folderPath = path.join(process.cwd(), "public", folderName);
         const targetPath = path.join(folderPath,fileName + ".txt");
         if (fs.existsSync(targetPath)) {
             fs.unlinkSync(targetPath);
