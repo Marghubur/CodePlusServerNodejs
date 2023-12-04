@@ -87,8 +87,8 @@ const SaveArticle = async (req, res, next) => {
             return next(ApiResponse('No files were uploaded.', 400));
         }
     
-        const uploadedFile = req.files.file;
-        const text = req.body.article;
+        var uploadedFile = req.files.file;
+        var text = req.body.article;
         var user = JSON.parse(text);
         var imgpath = util.saveFile("article", uploadedFile, user.Type + "_"+ user.Part, null);
         if (!imgpath) 
