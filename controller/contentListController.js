@@ -31,6 +31,9 @@ const GetContentList = async (req, res, next) => {
             }
         }).then(data => {
             var result = data.splice(offset, limit);
+            result.forEach( x => {
+                x.AllTags = x.Tags;
+            });
             return next(ApiResponse(result, 200));
         })
     } catch (error) {   
@@ -45,6 +48,9 @@ const GetAllContentList = async (req, res, next) => {
         const offset = (page - 1) * limit;
         contentlist.findAll().then(data => {
             var result = data.splice(offset, limit);
+            result.forEach( x => {
+                x.AllTags = x.Tags;
+            });
             return next(ApiResponse(result, 200));
         })
     } catch (error) {   
@@ -68,6 +74,7 @@ const GetContentById = async (req, res, next) => {
             
             const readData = fs.readFileSync(filepath, "utf8");
             data.BodyContent = readData;
+            data.AllTags = data.Tags;
             return next(ApiResponse(data, 200));
         })
     } catch (error) {   
@@ -103,7 +110,7 @@ const SaveArticle = async (req, res, next) => {
         var uploadedFile = req.files.file;
         var text = req.body.article;
         var user = JSON.parse(text);
-        var imgpath = util.saveFile("article", uploadedFile, user.Type + "_"+ user.Part, null);
+        var imgpath = util.saveFile("article", uploadedFile, user.Type + "_"+ user.Part, user.ImgPath);
         if (!imgpath) 
             return next(ApiResponse("Fail to save image", 500));
         
@@ -186,8 +193,7 @@ const PublishArticle = async (req, res, next) => {
         if (!content)
             return "record not found";
 
-        content.IsPublish = contentDetail.IsPublish;
-        if (content.IsPublish)
+        if (IsPublish)
             content.PublishOn = new Date();
 
         const contentDetail = {
@@ -200,10 +206,10 @@ const PublishArticle = async (req, res, next) => {
             Detail: content.Detail,
             ImgPath: content.ImgPath,
             IsArticle: content.IsArticle,
-            IsPublish: content.IsPublish,
+            IsPublish: IsPublish,
             PublishOn: content.PublishOn,
             SaveOn: content.SaveOn,
-            Tags: content.Tags,
+            Tags: content.Tags.length > 0 ? JSON.stringify(content.AllTags) : "[]",
             Author: content.Author,
         }
         await contentlist.update(contentDetail, {

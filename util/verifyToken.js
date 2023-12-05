@@ -1,13 +1,13 @@
 const  jwt  = require("jsonwebtoken");
 const { ApiResponse } = require("./apiResponse");
+const { APi_KEY } = require("../models/applicationConstant");
 
 const verifyToken = (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token)
         return next(ApiResponse("You are not authorized", 401));
 
-    var jwtSecret = "MyJwt@$Secret4codeplus@blogBYm4M@rghub"
-    jwt.verify(token, jwtSecret, (err, user) => {
+    jwt.verify(token, APi_KEY, (err, user) => {
         if (err)
             return next(ApiResponse("Token is not valid", 403));
         else

@@ -9,6 +9,7 @@ const path = require('path');
 const PORT = process.env.PORT || 7500;
 const contentRoute = require("./routes/contentListRoute");
 const userRoute = require("./routes/userRoute");
+const noteRoute = require("./routes/noteRoute");
 const cookieParser = require("cookie-parser");
 
 app.get("/", (req, res) => {
@@ -28,6 +29,7 @@ app.use(bodyParser.json());
 // routes middleware
 app.use("/api/Article", contentRoute);
 app.use("/api/User", userRoute);
+app.use("/api/Notes", noteRoute);
 
 // request handling middleware
 app.use((obj, req, res, next) => {

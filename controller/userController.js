@@ -3,6 +3,7 @@ const user = db.user;
 const bcrypt = require("bcryptjs");
 const { ApiResponse } = require("../util/apiResponse.js");
 const jwt = require("jsonwebtoken");
+const { APi_KEY, Admin, User, AdminRoleId, UserRoleId } = require("../models/applicationConstant.js");
 
 const getUser = async (req, res, next) => {
     res.send({msg: "User Controller hit successfully"});
@@ -49,12 +50,13 @@ const UserRegistration = async (req, res, next) => {
             userId = 1;
 
         var salt = await bcrypt.genSalt(10);
+        var hashPassword = await bcrypt.hash(Password, salt);
         const userDetail = {
             UserId: userId,
             UserName: UserName,
             Email: Email,
-            Password: bcrypt.hash(Password, salt),
-            UsertypeId: 0,
+            Password: hashPassword,
+            UsertypeId: UserRoleId,
         }
         await user.create(userDetail);
 
@@ -84,17 +86,16 @@ const Login = async (req, res, next) => {
 
         var role = null;
         switch (existUser.UsertypeId) {
-            case 1:
-                role = "Admin"
+            case AdminRoleId:
+                role = Admin.toLocaleLowerCase()
                 break;
             default:
-                role = "User"
+                role = User.toLocaleLowerCase()
                 break;
         }
-        var jwtSecret = "MyJwt@$Secret4codeplus@blogBYm4M@rghub";
-        const token = jwt.sign({id: existUser.UserId, user: existUser, email: existUser.Email, role:role}, jwtSecret);
+        const token = jwt.sign({id: existUser.UserId, user: existUser, email: existUser.Email, role:role}, APi_KEY);
         return res.cookie("access_token", token, {httpOnly: true}).status(200).json(ApiResponse({
-            User: existUser,
+            user: existUser,
             Token: token
         }, 200));
     } catch (error) {
