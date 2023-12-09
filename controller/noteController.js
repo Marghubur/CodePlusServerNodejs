@@ -73,7 +73,7 @@ const createNote = async (noteDetail) => {
         if (lasNote) {
             noteId = lasNote.NoteId + 1;
         } 
-        var filepath = util.saveTxtFile("Notes", noteDetail.Content, "NOTES_"+ noteId);
+        var filepath = util.saveTxtFile("notes", noteDetail.Content, "NOTES_"+ noteId);
         if (!filepath)
             return next(ApiResponse("Fail to generate text file", 500));
 

@@ -78,7 +78,7 @@ const Login = async (req, res, next) => {
 
         var existUser = await user.findOne({ where: { Email: Email } });
         if (!existUser)
-            return next(ApiResponse("Please enter regitered email", 500));
+            return next(ApiResponse("Please enter registered email", 500));
 
         isPasswordCorrect = await bcrypt.compare(Password, existUser.Password);
         if (!isPasswordCorrect)
@@ -93,7 +93,7 @@ const Login = async (req, res, next) => {
                 role = User.toLocaleLowerCase()
                 break;
         }
-        const token = jwt.sign({id: existUser.UserId, user: existUser, email: existUser.Email, role:role}, APi_KEY);
+        const token = jwt.sign({id: existUser.UserId, user: existUser, email: existUser.Email, role:role}, APi_KEY, { expiresIn: '1h' });
         return res.cookie("access_token", token, {httpOnly: true}).status(200).json(ApiResponse({
             user: existUser,
             Token: token
