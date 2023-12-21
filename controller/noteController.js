@@ -117,4 +117,17 @@ const updateNote = async (noteDetail) => {
     }
 }
 
-module.exports = {GetAllNotes, GetNoteById, ManageNote}
+const CreateFolder = async(req, res, next) => {
+    try {
+        var folderName = req.body.FolderName;
+        if (!folderName)
+            return next(ApiResponse("Folder name is valid", 500));
+
+        var result = util.CreateFolder(folderName);
+        return next(ApiResponse(result, 200));
+    } catch (error) {
+        return (error);
+    }
+}
+
+module.exports = {GetAllNotes, GetNoteById, ManageNote, CreateFolder}

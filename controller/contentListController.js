@@ -6,6 +6,9 @@ const util = require("../util/util.js");
 const { ApiResponse } = require("../util/apiResponse.js");
 const fs = require('fs');
 
+const minNumber = 20;
+const maaxNumber = 9999999999;
+
 const getContent = async (req, res, next) => {
     return next(ApiResponse({msg: __dirname + ": " + process.cwd()}, 200));
 };
@@ -110,12 +113,12 @@ const SaveArticle = async (req, res, next) => {
         var uploadedFile = req.files.file;
         var text = req.body.article;
         var user = JSON.parse(text);
-        var imgpath = util.saveFile("article", uploadedFile, user.Type + "_"+ user.Part, user.ImgPath);
+        var imgpath = util.saveFile("article", uploadedFile, user.Type+ getUniqueRandomInt(minNumber, maaxNumber).toString() + "_"+ user.Part, user.ImgPath);
         if (!imgpath) 
             return next(ApiResponse("Fail to save image", 500));
         
         user.ImgPath = imgpath;
-        var filepath = util.saveTxtFile("article", user.BodyContent, user.Type + "_"+ user.Part);
+        var filepath = util.saveTxtFile("article", user.BodyContent, user.Type+ getUniqueRandomInt(minNumber, maaxNumber).toString() + "_"+ user.Part);
         if (!filepath)
             return next(ApiResponse("Fail to generate text file", 500));
         
@@ -183,6 +186,22 @@ const updateArticle = async (contentDetail) => {
     } catch (error) {
         return (error);
     }
+}
+
+function getUniqueRandomInt(min, max) {
+    const generatedNumbers = new Set();
+  
+    function generate() {
+      const randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
+      if (!generatedNumbers.has(randomInt)) {
+        generatedNumbers.add(randomInt);
+        return randomInt;
+      } else {
+        return generate(); // Recursively try again if number is already generated
+      }
+    }
+  
+    return generate();
 }
 
 const PublishArticle = async (req, res, next) => {

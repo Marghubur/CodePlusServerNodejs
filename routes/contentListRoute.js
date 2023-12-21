@@ -8,13 +8,11 @@ router.get("/getAllContent", getAllContent);
 router.get("/GetContentList/:page", GetContentList);
 router.get("/GetAllContentList/:page", GetAllContentList);
 router.get("/GetContentById/:contentId", GetContentById);
-router.get("/SaveArticle", getAllContent);
 router.get("/GetArticleList/:page", GetArticleList);
-router.get("/PublishArticle", verifyAdmin, getAllContent);
 router.get("/getContent", getContent);
 router.post("/savefile", saveFile);
-router.post("/SaveArticle", SaveArticle);
-router.post("/PublishArticle", PublishArticle);
+router.post("/SaveArticle", verifyAdmin, SaveArticle);
+router.post("/PublishArticle", verifyAdmin, PublishArticle);
 
 
 

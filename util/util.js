@@ -42,6 +42,12 @@ module.exports = {
             } 
         });
         return path.join(folderName,fileName + ".txt");
+    },
+    CreateFolder(folderName) {
+        const folderPath = path.join(process.cwd(), "public", "notes", folderName);
+        !fs.existsSync(folderPath) && fs.mkdirSync(folderPath);
+
+        return "Folder created successfully";
     }
 
 }
